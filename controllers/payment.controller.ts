@@ -59,10 +59,7 @@ export const createGateaway = CatchAsyncErrore(
     try {
  
       const userId = req.user?._id as string;
-
-     
-          
-      
+      const user = await userModel.findById(userId);
       const amount = 2500;
       const currency = 'CHF';
       const subscriptionState = true;
@@ -71,12 +68,17 @@ export const createGateaway = CatchAsyncErrore(
       const subscriptionCancellationInterval = 'P1M'
       const referenceId = userId;
       const purpose = 'MaMa Marketplace subscription for 1 year';
+      const fields = {
+        email: {
+          value: user?.email,
+        },
+      };
 
       const successRedirectUrl = `https://mama-marketplace.vercel.app/payment-checking/${userId}`;
       const cancelRedirectUrl = `https://mama-marketplace.vercel.app/payment-cancel/${userId}`;
       const failedRedirectUrl = `https://mama-marketplace.vercel.app/payment-cancel/${userId}`;
       // console.log(amount, currency);
-      const response = await payrexx.createGateway({ referenceId,purpose,subscriptionCancellationInterval,subscriptionPeriod,subscriptionInterval,subscriptionState ,amount, currency,successRedirectUrl,cancelRedirectUrl,failedRedirectUrl });
+      const response = await payrexx.createGateway({ fields,referenceId,purpose,subscriptionCancellationInterval,subscriptionPeriod,subscriptionInterval,subscriptionState ,amount, currency,successRedirectUrl,cancelRedirectUrl,failedRedirectUrl });
      
 
       // Adjust for array or object response

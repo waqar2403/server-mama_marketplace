@@ -24,8 +24,21 @@ const payrexx = new PayrexxService(instance, secret);
 export const webhookController = CatchAsyncErrore(async (req: Request, res: Response, next: NextFunction) => {
   try {
     const data = req.body;
-    const email = data.transaction.contact.email || data.subscription.contact.email;
-    const status = data.transaction.status || data.subscription.status;
+    console.log('Request Body:', JSON.stringify(req.body, null, 2));
+    const email = 
+    data?.transaction?.contact?.email || 
+    data?.subscription?.contact?.email;
+  const status = 
+    data?.transaction?.status || 
+    data?.subscription?.status;
+
+  if (!email) {
+    console.error("Email not found in webhook data");
+    return res.status(400).json({ success: false, message: "Email not found in webhook data" });
+  }
+    console.log('email',email);
+    console.log('status',status);
+    console.log("aik hogyaaa");
     
     if (!email) {
       return res.status(400).json({ success: false, message: "Email not found in webhook data" });
@@ -40,7 +53,7 @@ export const webhookController = CatchAsyncErrore(async (req: Request, res: Resp
       for (const post of userPosts) {
           // Find the product to retrieve the images
           const product = await productModel.findById(post._id);
-    
+          console.log('product daa msla');
           if (product && product.images && product.images.length > 0) {
             // Delete images from Cloudinary
             const deletionPromises = product.images.map((image) =>
