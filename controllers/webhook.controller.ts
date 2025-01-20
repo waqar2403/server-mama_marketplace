@@ -44,39 +44,36 @@ export const webhookController = CatchAsyncErrore(async (req: Request, res: Resp
       return res.status(400).json({ success: false, message: "Email not found in webhook data" });
     }
 
-    if (status === 'in_notice' || status === 'cancelled' || status === 'declined' || status === 'failed' ) {
+    if ( status === 'declined' || status === 'failed' ) {
       const user=await userModel.findOne({email:email}) as IUser
       const userId=user._id as string
       const subscriptionId = parseInt(user.subscriptionId as string, 10);
-      const response = await payrexx.DeleteSubscription(subscriptionId);
-      const userPosts = await productModel.find({ postedBy: userId });
-      for (const post of userPosts) {
-          // Find the product to retrieve the images
-          const product = await productModel.findById(post._id);
-          console.log('product daa msla');
-          if (product && product.images && product.images.length > 0) {
-            // Delete images from Cloudinary
-            const deletionPromises = product.images.map((image) =>
-              cloudinary.uploader.destroy(image.public_id)
-            );
-            await Promise.all(deletionPromises);
-        
-          }
-    
-          // Delete the product from the database
-          await productModel.findByIdAndDelete(post._id);
-          console.log(`Product ${post._id} deleted successfully from the database`);
-        }
+      await payrexx.DeleteSubscription(subscriptionId);
       await redis.del(userId);
       
       await userModel.findOneAndDelete({email:email});
-     
+      return res.status(200).json({ success: true, message: "User deleted successfully" }); 
     }
+    if(status === 'in_notice' || status === 'cancelled' || status === 'waiting'){
+      const user=await userModel.findOne({email:email}) as IUser
+      user.paymentStatus = status;
+      await user.save();
+      return res.status(200).json({ success: true, message: "Payment status updated successfully" });
+    }
+    if( status ==='active' || status === 'confirmed'){
+      const user=await userModel.findOne({email:email}) as IUser
+      user.paymentStatus = status;
+      user.paymentDate = new Date();
+      user.paymentExpiryDate = new Date(new Date().setFullYear(new Date().getFullYear() + 1));
+      await user.save();
+      return res.status(200).json({ success: true, message: "Payment status updated successfully" });
+    }
+    return res.status(200).json({ success: true, message: "Payment status updated successfully" });
   } catch (err) {
     console.error("Webhook processing error:", err);
-    return res.status(500).json({ 
-      success: false, 
-      message: "Internal server error processing webhook" 
+    return res.status(200).json({ 
+      success: true, 
+      message: " webhook" 
     });
   }
 });

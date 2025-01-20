@@ -58,7 +58,7 @@ export const createGateaway = CatchAsyncErrore(
   async (req:Request, res:Response)=>{
     try {
  
-      const userId = req.user?._id as string;
+      const userId = req.user?._id || req.body?.user?._id as string;
       const user = await userModel.findById(userId);
       const amount = 2500;
       const currency = 'CHF';
