@@ -228,7 +228,8 @@ export const paymentchecker = async (req: Request, res: Response, next: NextFunc
       return res.status(201).json({ success: true, message: 'Payment confirmed' });
     } else {
       // console.log('Payment declined');
-      await userModel.findByIdAndDelete(userId);
+      await userModel.findByIdAndUpdate({userId, paymentStatus: 'declined'});
+
       return res.status(200).json({ success: false, message: 'Payment declined' });
     }
   } catch (error: any) {
