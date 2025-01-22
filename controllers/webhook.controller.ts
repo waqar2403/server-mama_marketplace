@@ -51,7 +51,7 @@ export const webhookController = CatchAsyncErrore(async (req: Request, res: Resp
       await payrexx.DeleteSubscription(subscriptionId);
       await redis.del(userId);
       
-      await userModel.findOneAndDelete({email:email});
+      await userModel.findOneAndDelete({email:email, paymentStatus:'declined'});
       return res.status(200).json({ success: true, message: "User deleted successfully" }); 
     }
     if(status === 'in_notice' || status === 'cancelled' || status === 'waiting'){

@@ -2,7 +2,7 @@ import axios, { AxiosResponse } from 'axios';
 import qs from 'qs';
 import Base64 from 'crypto-js/enc-base64';
 import hmacSHA256 from 'crypto-js/hmac-sha256';
-
+require('dotenv').config();
 const baseUrl = 'https://api.payrexx.com/v1.0/';
 
 interface PayrexxParams {
@@ -46,7 +46,7 @@ export class PayrexxService {
   public async DeleteSubscription(id: number): Promise<AxiosResponse> {
     const bodyParams = {
       userId: id,
-      instance: "nicolasgrimm", // Replace with actual instance fetching logic
+      instance: process.env.PAYREXX_INSTANCE, // Replace with actual instance fetching logic
   };
   const queryStr = qs.stringify(bodyParams);
 
@@ -58,7 +58,7 @@ export class PayrexxService {
       return await axios.delete(url, {
           headers: {
               'Content-Type': 'application/x-www-form-urlencoded',
-              'X-API-KEY': process.env.PAYREXX_API_KEY || 'Vk63GZvmlGAAF9KeNgLzfurXGvxn0s', // Replace with environment variable or securely stored value
+              'X-API-KEY': process.env.PAYREXX_API_KEY  // Replace with environment variable or securely stored value
           },
       });
   } catch (error) {
@@ -84,7 +84,7 @@ export class PayrexxService {
     // Define body parameters for the request
     const bodyParams = {
         userId: id,
-        instance: "nicolasgrimm", // Replace with actual instance fetching logic
+        instance: process.env.PAYREXX_INSTANCE, // Replace with actual instance fetching logic
     };
 
     // Serialize the parameters to x-www-form-urlencoded format
@@ -98,7 +98,7 @@ export class PayrexxService {
         return await axios.post(url, queryStr, {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
-                'X-API-KEY': process.env.PAYREXX_API_KEY || 'Vk63GZvmlGAAF9KeNgLzfurXGvxn0s', // Replace with environment variable or securely stored value
+                'X-API-KEY': process.env.PAYREXX_API_KEY , // Replace with environment variable or securely stored value
             },
         });
     } catch (error) {
